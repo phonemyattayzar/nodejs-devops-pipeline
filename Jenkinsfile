@@ -5,7 +5,8 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 // Automatically pulls the current code from the linked GitHub repository
-                checkout scm
+                 git branch: 'main', 
+                    url: 'https://github.com/phonemyattayzar/nodejs-devops-pipeline.git'
             }
         }
 
