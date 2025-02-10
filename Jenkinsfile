@@ -1,53 +1,48 @@
 pipeline {
-  agent any
+    agent any
 
-  tools {
-    nodejs "node18" // Matches the Node.js installation name in Jenkins
-  }
-
-  stages {
-    // Stage 1: Checkout code from GitHub
-    stage('Checkout') {
-      steps {
-        git 'https://github.com/phonemyattayzar/nodejs-devops-pipeline.git'
-      }
+    tools {
+        nodejs "node18" 
     }
 
-    // Stage 2: Install dependencies
-    stage('Install Dependencies') {
-      steps {
-        sh 'npm install'
-      }
-    }
-
-    // Stage 3: Run tests
-    stage('Test') {
-      steps {
-        sh 'npm test'
-      }
-    }
-
-    // Stage 4: Build the app (optional)
-    stage('Build') {
-      steps {
-        sh 'npm run build'
-      }
-    }
-  }
-
-  // Post-build actions (e.g., notifications)
-  post {
-    always {
-      script {
-        // Send email on failure
-        if (currentBuild.result == 'FAILURE') {
-          emailext (
-            subject: "🚨 CI Pipeline Failed: ${env.JOB_NAME}",
-            body: "Check the build log: ${env.BUILD_URL}",
-            to: 'kophonemyat667@gmail.com'
-          )
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/phonemyattayzar/nodejs-devops-pipeline.git'
+            }
         }
-      }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'npm test'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
     }
-  }
+
+    post {
+        always {
+            echo 'Sending email notification...'
+            emailext(
+                to: 'kophonemyat667@gmail.com',
+                subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME}",
+                body: "Build ${currentBuild.currentResult} for job ${env.JOB_NAME} at ${env.BUILD_URL}"
+            )
+        }
+
+        failure {
+            echo 'Build failed!'
+        }
+    }
 }
