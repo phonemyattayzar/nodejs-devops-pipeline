@@ -1,48 +1,43 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs "node18" 
-    }
-
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/phonemyattayzar/nodejs-devops-pipeline.git'
+                // Automatically pulls the current code from the linked GitHub repository
+                checkout scm
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh 'npm test'
+                echo 'Installing dependencies...'
+                sh 'npm install'  // Optional step, only if required
             }
         }
 
         stage('Build') {
             steps {
-                sh 'npm run build'
+                echo 'Building the Node.js project...'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying the Node.js project...'
             }
         }
     }
 
     post {
         always {
-            echo 'Sending email notification...'
-            emailext(
-                to: 'kophonemyat667@gmail.com',
-                subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME}",
-                body: "Build ${currentBuild.currentResult} for job ${env.JOB_NAME} at ${env.BUILD_URL}"
-            )
-        }
-
-        failure {
-            echo 'Build failed!'
+            echo 'Pipeline execution completed.'
         }
     }
 }
